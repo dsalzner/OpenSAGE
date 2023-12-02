@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using OpenSage.IO;
@@ -12,6 +13,9 @@ namespace OpenSage.Data.Rep
 
         public static ReplayFile FromFileSystemEntry(FileSystemEntry entry, bool onlyHeader = false)
         {
+            if (entry is null) {
+                throw new Exception("Replay FileSystemEntry is null");
+            }
             using (var stream = entry.Open())
             using (var reader = new BinaryReader(stream, Encoding.Unicode, true))
             {

@@ -9,6 +9,8 @@ namespace OpenSage.Data.Map
 {
     internal static class SidesListUtility
     {
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         public static void SetupGameSides(
             Game game,
             MapFile mapFile,
@@ -97,12 +99,17 @@ namespace OpenSage.Data.Map
             // TODO: There might be more than one civilian player.
             mapPlayers.Add(originalMapPlayers.FirstOrDefault(x => (string)x.Properties["playerFaction"].Value == "FactionCivilian"));
 
+            foreach(var player in originalMapPlayers) {
+                logger.Info("MapPlayers Entry: " + player.Properties["playerFaction"].Value);
+            }
+
             //var hasAIPlayer = false;
             for (var i = 0; i < playerSettings.Length; i++)
             {
                 var playerSetting = playerSettings[i];
 
-                var factionPlayer = originalMapPlayers.First(x => (string) x.Properties["playerFaction"].Value == playerSetting.SideName);
+                logger.Info("PlayerSideName: " + playerSetting.SideName);
+                var factionPlayer = originalMapPlayers.First(x => (string) x.Properties["playerFaction"].Value == "Faction" + playerSetting.SideName);
 
                 var isHuman = playerSetting.Owner == PlayerOwner.Player;
 
@@ -322,7 +329,14 @@ namespace OpenSage.Data.Map
             {
                 if (!(bool)mapPlayers[i].Properties["playerIsHuman"].Value)
                 {
-                    var playerSide = game.AssetStore.PlayerTemplates.GetByName(playerSettings[i - 2].SideName).Side;
+                    var playerTemplate = game.AssetStore.PlayerTemplates.GetByName(playerSettings[i - 2].SideName);
+                    if (playerTemplate is null)
+                    {
+                        logger.Warn("Player Template for player \"" + playerSettings[i - 2] + "\" does not exist.");
+                        continue;
+                    }
+
+                    var playerSide = playerTemplate.Side;
                     var sourcePlayerName = $"Skirmish{playerSide}";
 
                     // Copy the scripts from the according skirmish player for all AI players.

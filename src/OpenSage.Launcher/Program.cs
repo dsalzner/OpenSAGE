@@ -160,11 +160,12 @@ namespace OpenSage.Launcher
 
                 if (opts.ReplayFile != null)
                 {
+                    logger.Info("ReplayFile Command-Line Option: " + opts.ReplayFile);
                     var replayFile = game.ContentManager.UserDataFileSystem?.GetFile(Path.Combine("Replays", opts.ReplayFile));
+                    logger.Info("ReplayFile Full Path: " + replayFile);
                     if (replayFile == null)
                     {
-                        logger.Debug("Could not find entry for Replay " + opts.ReplayFile);
-                        game.ShowMainMenu();
+                        throw new Exception("Specified Replay file \"" + opts.ReplayFile + "\" does not exist in UserDataFolder");
                     }
 
                     game.LoadReplayFile(replayFile);

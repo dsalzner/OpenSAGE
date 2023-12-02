@@ -57,6 +57,8 @@ namespace OpenSage
         private readonly FileSystem _fileSystem;
         private readonly WndCallbackResolver _wndCallbackResolver;
 
+        private static NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         internal readonly CursorManager Cursors;
 
         internal GraphicsLoadContext GraphicsLoadContext { get; }
@@ -145,6 +147,7 @@ namespace OpenSage
 
         public void LoadReplayFile(FileSystemEntry replayFileEntry)
         {
+            logger.Info("Loading replay file " + replayFileEntry);
             var replayFile = ReplayFile.FromFileSystemEntry(replayFileEntry);
 
             var mapFilename = replayFile.Header.Metadata.MapFile.Replace("userdata", ContentManager.UserDataFileSystem?.RootDirectory);
@@ -489,6 +492,15 @@ namespace OpenSage
                 // This has to be done after the ContentManager is initialized and
                 // the GameData.ini file has been parsed because we don't know
                 // the UserDataFolder before then.
+
+                if (UserDataFolder == "")
+                {
+                    logger.Warn("UserDataFolder string is empty");
+                }
+                if (Directory.Exists(UserDataFolder) == false)
+                {
+                    logger.Warn("UserDataFolder \"" + UserDataFolder + "\" does not exist.");
+                }
                 if (UserDataFolder is not null && Directory.Exists(UserDataFolder))
                 {
                     ContentManager.UserDataFileSystem = AddDisposable(new DiskFileSystem(UserDataFolder));
