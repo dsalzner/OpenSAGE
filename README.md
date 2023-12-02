@@ -66,6 +66,60 @@ Here's a rough roadmap:
 * [x] Linux
   * OpenGL 4.3
 
+## Compiling & Running on Linux
+
+1. Set path to the Command & Conquer Generals directory
+
+```
+export CNC_GENERALS_PATH="<Path to Command and Conquer Generals>"
+```
+
+2. Install dotnet
+
+for "Ubuntu 22.04.3 LTS":
+
+```
+sudo apt install dotnet6
+```
+
+3. Build
+
+```
+cd src/ && dotnet build
+```
+
+4. Set a symlink to libdl.so
+if you see "Unable to load shared library 'libdl'"
+
+```
+sudo ln -s /usr/lib/x86_64-linux-gnu/libdl.so.2 /usr/lib/liblibdl.so
+```
+
+Note:
+
+* "liblibdl.so" instead of "libdl.so" is intentional
+
+5. Run
+
+```
+./OpenSage.Launcher/bin/Debug/net7.0/OpenSage.Launcher --renderer Vulkan
+```
+
+Note:
+
+* as of 2023-12-02 the shader compilation with veldrid.spirv 1.0.15 fails with OpenGL "Veldrid.SPIRV.SpirvCompilationException: Compilation failed". You may need to use Vulkan instead.
+* some systems produce black renderings (e.g. GeForce RTX 3060 card with Nvidia Driver 470.223.02), but Intel integrated graphics on i7-4550U with mesa driver works fine though it warns about some missing features.
+* you can check vulkan supported shader features with "vulkaninfo"
+
+6. Running a replay file
+
+```
+mkdir -p $HOME/Command and Conquer Generals Data/Replays/
+ln -s "$PWD/OpenSage.Game.Tests/Data/Rep/Assets/Test_005_BuildSellPowerPlant.rep" "$HOME/Command and Conquer Generals Data/Replays/"
+
+./OpenSage.Launcher/bin/Debug/net7.0/OpenSage.Launcher --renderer Vulkan --replay "Test_005_BuildSellPowerPlant.rep"
+```
+
 ## Legal disclaimers
 
 * This project is not affiliated with or endorsed by EA in any way. Command & Conquer is a trademark of Electronic Arts.
